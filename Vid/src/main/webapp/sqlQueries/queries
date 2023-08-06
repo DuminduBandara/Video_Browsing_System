@@ -1,0 +1,8 @@
+CREATE TABLE `videobrowser`.`user` (
+  `userName` VARCHAR(100) NOT NULL,
+  `name` VARCHAR(100) NOT NULL,
+  `email` VARCHAR(100) NOT NULL,
+  PRIMARY KEY (`userName`),
+  UNIQUE INDEX `userName_UNIQUE` (`userName` ASC) VISIBLE);
+  
+ 

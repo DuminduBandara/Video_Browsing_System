@@ -1,0 +1,42 @@
+package com.videoCtrl;
+
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+
+public class uploadVideoServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    
+    public uploadVideoServlet() {
+    	
+       
+    }
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		String vname = request.getParameter("videoTitle");
+		String vdesc = request.getParameter("vdesc");
+		String vcategory = request.getParameter("vcategory");
+		String username=request.getParameter("username");
+		
+		boolean isTrue;
+		
+		isTrue= uploadVideo.uploadVideo(vname, vdesc, vcategory, username);
+		if(isTrue == true) {
+			RequestDispatcher dis = request.getRequestDispatcher("success.jsp");
+			dis.forward(request, response);
+		}
+		else { 
+			RequestDispatcher dis2 = request.getRequestDispatcher("unsuccess.jsp");
+		    dis2.forward(request, response);
+	}
+		
+	}
+
+}

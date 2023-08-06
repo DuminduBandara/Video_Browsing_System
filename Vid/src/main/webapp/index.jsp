@@ -1,0 +1,203 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@page import="java.sql.DriverManager"%>
+<%@page import="java.sql.ResultSet"%>
+<%@page import="java.sql.Statement"%>
+<%@page import="java.sql.Connection"%>
+<%@page import="java.util.List"%>
+<%@page import="com.videoCtrl.Profile"%>
+
+<%
+String id = request.getParameter("userId");
+String driverName = "com.mysql.jdbc.Driver";
+String connectionUrl = "jdbc:mysql://localhost:3306/";
+String dbName = "video_db";
+String userId = "root";
+String password = "200103003074";
+
+
+try {
+Class.forName(driverName);
+} catch (ClassNotFoundException e) {
+e.printStackTrace();
+}
+
+Connection connection = null;
+Statement statement = null;
+ResultSet resultSet = null;
+%>
+
+
+<% HttpSession se = request.getSession(true);
+	String str = se.getAttribute("username").toString();
+%>
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+  	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+
+  	<link rel="stylesheet" href="./styles/style.css">
+  </head>
+  <body onload="loadDate()">
+  	
+  	<div class="container-fluid text-center bg-light top-header g-0">
+	  <div class="main-header row align-items-center d-flex flex-wrap">
+	    <div class="col-12 col-lg-2 justify-content-center order-1">
+	      <a href="./index.jsp" class="navbar-brand">
+	      	<img src="./img/logo.jpg" class="img-fluid" style="width:70px;" alt="...">
+	      </a>
+	    </div>
+	    <div class="col-12 col-lg-7 order-lg-2 order-3 my-3">
+	      <form class="d-flex" role="search">
+	        <input class="form-control me-2 py-1" type="search" placeholder="Search" aria-label="Search" name="search">
+	        <button class="btn text-light" style="background:#394339;" type="submit">Search</button>
+	      </form>
+	    </div>
+	    <div class="col-12 col-lg-3 order-lg-3 order-2 d-none d-lg-block">
+	    	<div class="row">
+		    <div class="col">
+		      <a href="./library.jsp" target="_blank" class="btn" style="background:var(--clr-1); color:var(--clr-5);">
+		      	<i class="bi bi-collection"></i>
+		      	<span>PlayList</span>
+		      </a>
+		    </div>
+		    <div class="col">
+		      <a href="./profile.jsp" target="_blank" class="btn" style="background:var(--clr-1); color:var(--clr-5);">
+		      	<%=str%>
+		      </a>
+		    </div>
+		  </div>
+	    </div>
+	  </div>
+	  
+	  
+	  <nav id="navbar-example2" class="navbar bg-light px-3 navbar-expand-lg">
+  		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+	      <span class="navbar-toggler-icon"></span>
+	    </button>
+	    <div class="collapse navbar-collapse justify-content-between mt-3 mt-lg-0" id="navbarSupportedContent">
+		  <ul class="nav nav-pills navbar-nav">
+		    <li class="nav-item">
+		      <a class="nav-link" href="#features">Features</a>
+		    </li>
+		    <li class="nav-item">
+		      <a class="nav-link" href="#news">News</a>
+		    </li>
+		    <li class="nav-item">
+		      <a class="nav-link" href="#music">Music</a>
+		    </li>
+		    <li class="nav-item">
+		      <a class="nav-link" href="#entertainment">Entertainment</a>
+		    </li>
+		    <li class="nav-item">
+		      <a class="nav-link" href="#business">Business</a>
+		    </li>
+		    <li class="nav-item">
+		      <div class="col-12 col-lg-3 order-lg-3 order-2  d-lg-none">
+		    	<div class="row">
+			    	<div class="col">
+				      <a href="./accounts.jsp" target="_blank" class="btn" style="background:var(--clr-1); color:var(--clr-5);">
+				      	<i class="bi bi-person"></i>
+				      	<span>Login</span>
+				      </a>
+				    </div>
+				    <div class="col">
+				      <a href="./accounts.jsp" target="_blank" class="btn" style="background:var(--clr-1); color:var(--clr-5);">
+				      	<i class="bi bi-person-plus"></i>
+				      	<span>Sign up</span>
+				      </a>
+				    </div>
+			  </div>
+		    </div>
+		    </li>
+		       
+		    		    
+		  </ul>
+		
+		 </div>
+		</nav>
+	  
+	</div>
+	
+	<div data-bs-spy="scroll" data-bs-target="#navbar-example2" data-bs-root-margin="0px 0px -40%" data-bs-smooth-scroll="true" class="scrollspy-example p-3" tabindex="0">
+	  
+	  <div id="features" class="container-fluid">
+	  	<div class="row">
+	  		
+	  		<%
+	  		
+	  		try{
+	  			connection = DriverManager.getConnection(connectionUrl+dbName, userId, password);
+	  			statement=connection.createStatement();
+	  			String getSearch = request.getParameter("search");
+	  			String sqlQ; 
+	  			
+	  			if(getSearch != null){
+	  				sqlQ ="select * from video where idvideo like '%"+getSearch+"%' or vname like '%"+getSearch+"%' or description like '%"+getSearch+"%' or category like '%"+getSearch+"%'";
+	  			}else{
+	  				sqlQ ="select * from video";
+	  			}
+	  			
+	  			resultSet = statement.executeQuery(sqlQ);
+	  			while(resultSet.next()){
+	  				%>
+	  			
+	  		
+	  		<div class="col-12 col-md-6 col-lg-3 my-3">
+	  			<div class="card" style="width: 18rem;">
+	  			  <div class="card-img">
+				  	<img src="./img/i1.jpg" class="card-img-top" alt="...">
+				  	<form action="getvid" method="post">
+				  		<input type="text" name="vid" style="display:none;" value="<%=resultSet.getInt("idvideo")%>">
+				  		<input type="text" name="wTime" style="display:none;" value="ht" id="getDate">
+				  		<button type="submit" class="btn play-btn"><i class="bi bi-play-circle"></i></button>
+				  	</form>
+				  	
+				  </div>
+				  <div class="card-body">
+				    <h5 class="card-title"><%=resultSet.getString("vname")%></h5>
+				    <p class="card-text"><%=resultSet.getString("description")%></p>
+				  </div>
+				</div>
+	  		</div>
+	  		
+	  		<% 
+	  		}
+	  		}catch(Exception e){
+	  			e.printStackTrace();
+	  		}	
+	  		%>
+	  </div>
+	  
+	</div>
+	</div>
+	
+  	
+  	
+	
+			
+	
+	
+	<footer style="background:var(--clr-1);" class="text-center py-4">
+		<a href="#" class="btn text-light">@watchita</a>
+	</footer>
+	
+  	<a  href="#" class="pop"><i class="bi bi-caret-up"></i></a>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+  	<script src="./JS/script.js"></script>
+  	<script>
+  		function loadDate(){
+  			var dt = new Date().toLocaleString());
+  			document.getElementByID("getDate").value= dt;
+  		}
+  	</script>
+  	
+  </body>
+</html>
